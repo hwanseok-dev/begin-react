@@ -5,17 +5,13 @@ import Wrapper from "./Wrapper";
 import InputSample from "./InputSample";
 import UserList from "./UserList";
 import CreateUser from "./CreateUser";
-
+import useInputs from "./useInputs"
 function countActiveUsers(users) {
     console.log('활성 사용자 수를 세는 중...');
     return users.filter(user => user.active).length;
 }
 
 const initialState = {
-    inputs: {
-        username: '',
-        email: '',
-    },
     users: [
         {id: 1, username: 'hwanseok1', email: 'hwanseok1.dev@gmail.com', active: true},
         {id: 2, username: 'hwanseok2', email: 'hwanseok2.dev@gmail.com', active: false},
@@ -59,9 +55,13 @@ function reducer(state, action) {
 
 function App() {
     const [state, dispatch] = useReducer(reducer, initialState);
+    const [form, onChange, reset] = useInputs({
+        username:'',
+        email:''
+    })
     const nextId = useRef(4);
     const {users} = state;
-    const {username, email} = state.inputs;
+    const {username, email} = form;
 
     const onCreate = useCallback(e => {
         const {name, value} = e.target;
@@ -74,15 +74,9 @@ function App() {
             },
         });
         nextId.current += 1;
-    }, [username, email])
-    const onChange = useCallback(e => {
-        const {name, value} = e.target;
-        dispatch({
-            type: 'CHANGE_INPUT',
-            name,
-            value
-        });
-    }, [])
+        reset();
+    }, [username, email, reset])
+
     const onToggle = useCallback((id) => {
         dispatch({
             type: 'TOGGLE_USER',
